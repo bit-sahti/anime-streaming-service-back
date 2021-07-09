@@ -1,7 +1,7 @@
 const Anime = require("../models/Anime.model");
 const Controller = require("./constructor/Controller");
-const MediaController = require("./Media.controller");
-const Formatter = require("../utils/Formatter.utils");
+const mediaController = require("./media.controller");
+const formatter = require("../utils/formatter.utils");
 
 class AnimeController extends Controller {
   constructor(animeModel) {
@@ -12,7 +12,7 @@ class AnimeController extends Controller {
     try {
       const { genre } = req.params;
       //genre is expected to be received in hyphanete lowercase, and be stored in Uppercase
-      const formattedGenre = Formatter.capitalize(genre);
+      const formattedGenre = formatter.capitalize(genre);
 
       const foundAnimes = await Anime.find({ genres: formattedGenre });
 
@@ -26,9 +26,9 @@ class AnimeController extends Controller {
     const { id } = req.params;
 
     try {
-      const animeSearchResult = await this.searchById(id);
+      const animeSearchResult = await this.Model.findById(id);
 
-      const animeMedia = await MediaController.searchRelations(id);
+      const animeMedia = await mediaController.searchRelations(id);
 
       res.status(200).json({
         data: {
