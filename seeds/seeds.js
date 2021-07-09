@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../.env'});
+require('dotenv').config();
 
 const mongoose = require('mongoose');
 const Anime = require('../models/Anime.model');
