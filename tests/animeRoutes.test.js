@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const request = require("supertest");
 const app = require("../index");
 
+const Formatter = require("../utils/Formatter.utils");
+
 afterAll(() => mongoose.connection.close());
 
 let responseBody, responseStatus;
@@ -25,16 +27,16 @@ describe("Get /animes", () => {
   });
 
   it("should return all documents on DB", () => {
-    expect(responseBody.data.length).toEqual(3);
+    expect(responseBody.data.length).toEqual(6);
   });
 });
 
-describe("Get animes/:genre", () => {
-  let genre = "Comédia";
+describe("Get animes/categories/genres", () => {
+  let genre = "mahou shoujo";
 
   beforeAll(async () => {
     const response = await request(app).get(
-      "/api/animes/" + encodeURIComponent(genre)
+      "/api/animes/categories/" + encodeURIComponent(genre)
     );
 
     responseBody = response.body;
@@ -56,8 +58,9 @@ describe("Get animes/:genre", () => {
   });
 
   it(`should not return any anime that is not a ${genre}`, () => {
+    const formattedGenre = Formatter.capitalize(genre);
     const matchGenre = responseBody.data.every((anime) =>
-      anime.genre.includes(genre)
+      anime.genres.includes(formattedGenre)
     );
 
     expect(matchGenre).toBeTruthy();
@@ -65,7 +68,7 @@ describe("Get animes/:genre", () => {
 });
 
 describe("Get call on animes/:id", () => {
-  let sampleAnime, badRequestBody, badRequestStatus;
+  let sampleAnime, unexistingIdReqBody, badRequestBody, badRequestStatus;
 
   beforeAll(async () => {
     const { body } = await request(app).get("/api/animes");
@@ -73,10 +76,15 @@ describe("Get call on animes/:id", () => {
     sampleAnime = body.data[0];
 
     const response = await request(app).get("/api/animes/" + sampleAnime._id);
+    const unexistingIDRes = await request(app).get(
+      "/api/animes/" + "6082d65fe511f735f5d25ec2"
+    );
     const badRequestRes = await request(app).get("/api/animes/" + "sdfghf");
 
     responseBody = response.body;
     responseStatus = response.status;
+
+    unexistingIdReqBody = unexistingIDRes.body;
 
     badRequestBody = badRequestRes.body;
     badRequestStatus = badRequestRes.status;
@@ -87,7 +95,6 @@ describe("Get call on animes/:id", () => {
   });
 
   it("should have data containing anime and media properties", () => {
-    //will arrays pass?
     expect(responseBody).toEqual(
       expect.objectContaining({
         data: {
@@ -102,15 +109,30 @@ describe("Get call on animes/:id", () => {
     );
   });
 
+  it("should only return one anime", () => {
+    expect(Array.isArray(responseBody.data.anime)).toBeFalsy();
+  });
+
   it("should return the anime with the requested id", () => {
-    expect(responseBody.data._id).toEqual(sampleAnime._id);
+    expect(responseBody.data.anime._id).toEqual(sampleAnime._id);
   });
 
-  it("should return a 'not found' status if requested id doesn't exist", () => {
-    expect(badRequestStatus).toEqual(404);
+  it("should return null properties if requested id doesn't exist", () => {
+    expect(unexistingIdReqBody).toEqual(
+      expect.objectContaining({
+        data: {
+          anime: null,
+          media: null,
+        },
+      })
+    );
   });
 
-  it("should return an error message in it's body if requested id doesn't exist", () => {
+  it("should return a'bad request' status if :id isn't a string", () => {
+    expect(badRequestStatus).toEqual(400);
+  });
+
+  it("should return an error message in it's body if requested id isn't a string", () => {
     expect(badRequestBody).toEqual(
       expect.objectContaining({
         error: {
