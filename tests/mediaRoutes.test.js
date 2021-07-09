@@ -8,7 +8,7 @@ let response;
 
 describe("Get /media", () => {
   beforeAll(async () => {
-    response = await request(app).get("/api/media")
+    response = await request(app).get("/api/media");
   });
 
   it("should be a successfull request", () => {
@@ -35,6 +35,7 @@ describe("Get call on media/:id", () => {
     sampleMedia = body.data[0];
 
     response = await request(app).get("/api/media/" + sampleMedia._id);
+
     unexistingIdRes = await request(app).get(
       "/api/media/" + "6082d65fe511f735f5d25ec2"
     );
@@ -47,19 +48,17 @@ describe("Get call on media/:id", () => {
   });
 
   it("should have a data property containing a single object", () => {
-    expect(response.body).toEqual(
+    expect(response.body.data).toEqual(
       expect.objectContaining({
-        data: {
-            _id: expect.any(String),
-            anime: expect.any(String),
-            mediaType: expect.any(String),
-            link: expect.any(String),
-            season: expect.any(Number),
-            number: expect.any(Number),
-            title: expect.any(String),
-            description: expect.any(String),
-            __v: expect.any(Number)
-        }
+        _id: expect.any(String),
+        anime: expect.any(String),
+        mediaType: expect.any(String),
+        link: expect.any(String),
+        season: expect.any(Number),
+        number: expect.any(Number),
+        title: expect.any(String),
+        description: expect.any(String),
+        __v: expect.any(Number),
       })
     );
   });

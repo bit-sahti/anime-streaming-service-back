@@ -9,8 +9,9 @@ afterAll(async () => {
 });
 
 const testUser = {
-    "email": "test@email.com",
-    "password": "123456",
+    username: "test",
+    email: "test@email.com",
+    password: "123456",
   }
 
 describe("POST call on sign up", () => {
@@ -19,12 +20,13 @@ describe("POST call on sign up", () => {
 
   beforeAll(async () => {
     response = await request(app)
-      .post('/api/auth/signup', (err) => console.log(err))
+      .post(url)
       .send(testUser)
 
     repeatedEmailRes = await request(app).post(url).send(testUser)
 
     invalidFieldsRes = await request(app).post(url).send({
+        username: 'os',
         email: 'sdedrtrj',
         password: ''
     });
@@ -70,5 +72,52 @@ describe("POST call on sign up", () => {
     };
 
     expect(checkErrorDetails(invalidFieldsRes.body.error.list)).toBeTruthy;
+  });
+});
+
+describe("POST call on login", () => {
+  const url = "/api/auth/login";
+  let response, invalidCredentialsReq;
+
+  beforeAll(async () => {
+    response = await request(app)
+      .post(url)
+      .send({
+        email: testUser.email,
+        password: testUser.password
+      })
+
+    invalidCredentialsReq = await request(app).post(url).send({
+        email: testUser.email,
+        password: 'sadretyjhg'
+    });
+  });
+
+  it("should have a success status", () => {
+    expect(response.status).toEqual(200);
+  });
+
+  it("should return a message with an authorization token", () => {
+    expect(response.body.message).toEqual(expect.objectContaining(
+      {
+        token: expect.any(String),
+        role: expect.any(String)
+      }
+    ));
+  });
+
+  it("should return a bad request status if fields don't match", () => {
+    expect(invalidCredentialsReq.status).toEqual(400);
+  });
+
+  it("should return a error message if fields don't match", () => {
+    expect(invalidCredentialsReq.body).toEqual(
+      expect.objectContaining({
+        error: {
+          type: expect.any(String),
+          message: expect.any(String),
+        },
+      })
+    );
   });
 });
