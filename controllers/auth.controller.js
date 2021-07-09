@@ -11,7 +11,7 @@ class AuthController extends Controller {
     signup = async (req, res, next) => {
         console.log('call on sign up')
         try {
-            const { email, password } = req.body;
+            const { username, email, password } = req.body;
 
             const userFromDB = await this.Model.findOne({ email });
 
@@ -26,6 +26,7 @@ class AuthController extends Controller {
 
             const newUser = await this.createOne(
                 {
+                    username,
                     email,
                     password: encryptedPassword
                 }
@@ -44,7 +45,7 @@ class AuthController extends Controller {
             const { email, password } = req.body;
 
             const userFromDB = await this.Model.findOne({ email });
-            console.log(userFromDB)
+
             const isPasswordCorrect = userFromDB ? passwordManager.decrypt(password, userFromDB.password) : false
 
             if (!userFromDB || !isPasswordCorrect) {
@@ -61,6 +62,7 @@ class AuthController extends Controller {
             res.status(200).json({
                 message: {
                     token,
+                    //the role should be plain text in order to be read on the front-end
                     role: userFromDB.role
                 }
             })

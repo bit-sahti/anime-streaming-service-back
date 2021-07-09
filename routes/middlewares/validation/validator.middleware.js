@@ -3,12 +3,21 @@ const joi = require('joi');
 
 class Validator {
   constructor() {
-    this.authSchema = joi.object()
+    this.signUpSchema = joi.object()
       .options( { abortEarly: false })
-      .keys({ 
+      .keys({        
+        username: joi.string().trim().min(3).max(30).required(),
         email: joi.string().trim().email().required(),
         password: joi.string().trim().min(6).required()
-      })
+      });
+
+    this.loginSchema = joi.object()
+    .options( { abortEarly: false })
+    .keys({
+      email: joi.string().trim().email().required(),
+      password: joi.string().trim().min(6).required()
+    });
+      
   }
 
   checkRequestedId = async (req, res, next) => {
@@ -35,22 +44,56 @@ class Validator {
     });
   }
 
-  checkAuthInfo = async(req, res, next) => {
-    const validationErrors = this.authSchema.validate(req.body);
+  checkInfo = (schema, info) => {
+    const validationErrors = schema.validate(info);
 
     if (validationErrors.error) {
-      const errorMessage = this.mountErrorMessage(validationErrors.error.details);
-
-      return res.status(400).json({
-        error: {
-          type: 'Validation',
-          list: errorMessage
-        }
-      })
+      return this.mountErrorMessage(validationErrors.error.details);
     }
 
-    next();
+    return null;
+  }
 
+  checkSignUpInfo = async (req, res, next) => {
+    try {
+      const errorMessage = this.checkInfo(this.signUpSchema, req.body)
+
+      if (errorMessage) {
+        return res.status(400).json({
+          error: {
+            type: 'Validation',
+            list: errorMessage
+          }
+        })
+      }
+
+      return next();
+    }
+
+    catch(err) {
+      console.log(err);
+    }
+  }
+
+  checkLoginInfo = async (req, res, next) => {
+    try {
+      const errorMessage = this.checkInfo(this.loginSchema, req.body)
+
+      if (errorMessage) {
+        return res.status(400).json({
+          error: {
+            type: 'Validation',
+            list: errorMessage
+          }
+        })
+      }
+
+      next();
+    }
+
+    catch(err) {
+      console.log(err);
+    }
   }
 }
 
