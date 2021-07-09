@@ -1,19 +1,21 @@
 const { Schema, Types, model } = require('mongoose');
 
 const AnimeSchema = new Schema({
-    title: { type: String, required: true },
+    title: { type: String, unique: true, required: true },
     description: { type: String, required: true },
-    genres: { type: [String], enum: []},
+    genres: { type: [String], required: true},
     episodesNumber: { type: Number, required: true},
     audio: {
         type: [ String ],
-        default: ['Japonês']
+        default: ['Japonês'],
+        required: true
     },
     subtitles: {
         type: [ String ],
-        default: ['Português']
+        default: ['Português'],
+        required: true
     },
-    score: { type: Number }
+    score: { type: Number, required: true }
 },
 {
     timestamps: true
