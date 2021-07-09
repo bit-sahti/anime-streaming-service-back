@@ -3,18 +3,6 @@ class Controller {
         this.Model = model;
     }
 
-    searchById = async id => {
-            const foundDoc = await this.Model.findById(id);
-
-            return foundDoc;
-    }
-
-    searchByQuery = async (query, options) => {
-        const foundDocs = await this.Model.find(query).sort(options);
-
-        return foundDocs;
-    }
-
     getAll = async (req, res, next) => {
         try {
             const docs = await this.Model.find({});
@@ -32,13 +20,25 @@ class Controller {
         const { id } = req.params;
 
         try {
-            const foundDoc = await this.searchById(id);
+            const foundDoc = await this.Model.findById(id);
 
             res.status(200).json({ data: foundDoc })
         }
 
         catch(err) {
             console.log(err);
+        }
+    }
+
+    createOne = async doc => {
+        try {
+            const newDoc = await this.Model.create(doc);
+
+            return newDoc;
+        }
+
+        catch(err) {
+            console.log(err)
         }
     }
 }
