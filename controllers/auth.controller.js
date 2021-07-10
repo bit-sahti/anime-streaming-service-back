@@ -9,7 +9,6 @@ class AuthController extends Controller {
     }
 
     signup = async (req, res, next) => {
-        console.log('call on sign up')
         try {
             const { username, email, password } = req.body;
 
@@ -24,7 +23,7 @@ class AuthController extends Controller {
 
             const encryptedPassword = passwordManager.encrypt(password)
 
-            const newUser = await this.createOne(
+            const newUser = await this.Model.create(
                 {
                     username,
                     email,

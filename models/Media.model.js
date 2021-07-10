@@ -1,7 +1,7 @@
 const { Schema, Types, model} = require('mongoose');
 
 const MediaSchema = new Schema({
-    anime: { type: Types.ObjectId, required: true },
+    anime: { type: Types.ObjectId, ref: 'Anime', required: true },
     mediaType: { type: String, enum: ['episode', 'movie', 'special'], required: true},
     link: { type: String, required: true },
     season: { type: Number, required: true },

@@ -30,11 +30,43 @@ class Controller {
         }
     }
 
-    createOne = async doc => {
+    createOne = async (req, res, next) => {
         try {
-            const newDoc = await this.Model.create(doc);
+            const newDoc = await this.Model.create(req.body);
 
-            return newDoc;
+            return res.status(201).json({
+                data: doc
+            })
+        }
+
+        catch(err) {
+            console.log(err)
+        }
+    }
+
+    updateOne = async (req, res, next) => {
+        try {
+            const { id } = req.params;
+
+            const updatedDoc = await this.Model.findByIdAndUpdate(id, req.body, { new: true })
+
+            return res.status(200).json({
+                data: updatedDoc
+            })
+        }
+
+        catch(err) {
+            console.log(err)
+        }
+    }
+
+    deleteOne = async (req, res, next) => {
+        try {
+            const { id } = req.params;
+
+            await this.Model.findByIdAndDelete(id);
+
+            return res.status(204).json({});
         }
 
         catch(err) {
