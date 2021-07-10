@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const joi = require('joi');
+const joiObjectid = require("joi-objectid");
+
+//it will enable us to validate MongoDB ids
+joi.objectId = require('joi-objectid')(joi);
 
 class Validator {
   constructor() {
@@ -17,6 +21,14 @@ class Validator {
       email: joi.string().trim().email().required(),
       password: joi.string().trim().min(6).required()
     });
+
+    this.listEntrySchema = joi.object()
+    .options({ abortEarly: false })
+    .keys({
+      anime: joi.objectId().required(),
+      relation: joi.string().valid('watching', 'watched', 'toWatch').required(),
+      isFavorite: joi.boolean()
+    })
       
   }
 
@@ -54,8 +66,8 @@ class Validator {
     return null;
   }
 
-  checkSignUpInfo = async (req, res, next) => {
-    try {
+  checkSignUpInfo = (req, res, next) => {
+   
       const errorMessage = this.checkInfo(this.signUpSchema, req.body)
 
       if (errorMessage) {
@@ -68,15 +80,11 @@ class Validator {
       }
 
       return next();
-    }
-
-    catch(err) {
-      console.log(err);
-    }
+    
   }
 
-  checkLoginInfo = async (req, res, next) => {
-    try {
+  checkLoginInfo = (req, res, next) => {
+    
       const errorMessage = this.checkInfo(this.loginSchema, req.body)
 
       if (errorMessage) {
@@ -89,11 +97,24 @@ class Validator {
       }
 
       next();
-    }
+    
 
-    catch(err) {
-      console.log(err);
-    }
+
+  }
+
+  checkListInfo = (req, res, next) => {
+    const errorMessage = this.checkInfo(this.listEntrySchema, req.body)
+
+      if (errorMessage) {
+        return res.status(400).json({
+          error: {
+            type: 'Validation',
+            list: errorMessage
+          }
+        })
+      }
+
+      next();
   }
 }
 
