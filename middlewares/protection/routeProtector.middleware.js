@@ -1,4 +1,4 @@
-const jwtManager = require('../../../utils/jwt.utils');
+const jwtManager = require('../../utils/jwt.utils');
 
 class Protector {
     userExclusive = async (req, res, next) => {

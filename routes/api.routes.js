@@ -5,7 +5,7 @@ const mediaRoutes = require('./mediaRoutes/media.public.routes');
 const authRoutes = require('./authRoutes/auth.routes');
 const userListRoutes = require('./userRoutes/userLists.routes');
 
-const protector = require('./middlewares/protection/routeProtector.middleware');
+const protector = require('../middlewares/protection/routeProtector.middleware');
 
 router.use('/auth', authRoutes);
 router.use('/animes', animeRoutes);

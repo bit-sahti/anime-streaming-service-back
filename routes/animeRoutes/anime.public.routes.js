@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const animeController = require('../../controllers/anime.controller');
-const validator = require('../middlewares/validation/validator.middleware');
+const validator = require('../../middlewares/validation/validator.middleware');
 
 router.get('/', animeController.getAll);
 router.get('/categories/:genre', animeController.getAllFromGenre);
