@@ -4,13 +4,13 @@ class JwtManager {
   generateToken = id => {
     return jwt.sign(
       { userId: id },
-      process.env.JWT_SECRET,
+      process.env.JWT_HASH_SECRET,
       { expiresIn: process.env.JWT_EXPIRATION_TIME }
     )
   }
 
   verifyToken = token => {
-      const { userId } = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+      const { userId } = jwt.verify(token.split(' ')[1], process.env.JWT_HASH_SECRET);
 
       return userId;
   }
