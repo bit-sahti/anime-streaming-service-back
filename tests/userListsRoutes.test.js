@@ -14,7 +14,6 @@ let token, userId, animes, response, listEntry, baseUrl;
 
 beforeAll(async () => {
     await mongoose.connection.dropCollection('users');
-    await mongoose.connection.dropCollection('list-entries');
 
     const signUpResponse = await request(app).post('/api/auth/signup').send(testUser);
     userId = signUpResponse.body.message.split(' ')[5];
@@ -33,12 +32,14 @@ beforeAll(async () => {
     response = await request(app).post(baseUrl + '/lists').send({
         anime: animes[0]._id,
         relation: `${listName}`
-    }).set('Authorization', `Bearer: ${token}`)
+    }).set('Authorization', `Bearer: ${token}`);
 
     listEntry = response.body.data;
 })
 
-afterAll(() => mongoose.connection.close());
+afterAll(async () => {
+    await mongoose.connection.close()
+});
 
 describe('POST call on user/:id/lists', () => {
     let repeatedEntryRes, unloggedRes, differentUserRes;
@@ -54,7 +55,7 @@ describe('POST call on user/:id/lists', () => {
             relation: 'watching'
         }).set('Authorization', `Bearer: ${token}`);
 
-        unloggedRes = await await request(app).post('/api/users/60e8f4d013fe2875cdd0c633/lists').send({
+        unloggedRes = await request(app).post('/api/users/60e8f4d013fe2875cdd0c633/lists').send({
             anime: animes[2]._id,
             relation: 'watching'
         })
