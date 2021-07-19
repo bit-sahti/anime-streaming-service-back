@@ -9,9 +9,9 @@ class MediaController extends Controller {
     searchRelations = async id => {
         const options = { season: 1, number: 1}
 
-        const episodes = await this.Model.find({ mediaType: 'episode', anime: id }, options);
-        const movies = await this.Model.find({ mediaType: 'movie', anime: id }, options);
-        const specials = await this.Model.find({ mediaType: 'special', anime: id }, options);
+        const episodes = await this.Model.find({ mediaType: 'episode', anime: id }).sort(options);
+        const movies = await this.Model.find({ mediaType: 'movie', anime: id }).sort(options);
+        const specials = await this.Model.find({ mediaType: 'special', anime: id }).sort(options);
 
         if (!episodes.length && !movies.length && !specials.length) return null;
 
