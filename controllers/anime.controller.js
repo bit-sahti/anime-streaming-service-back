@@ -39,7 +39,21 @@ class AnimeController extends Controller {
     } catch (err) {
       console.log(err)
     }
-  };
+  }
+
+  searchByTitle = async (req, res, next) => {
+    const { search } = req.query;    
+
+    try {
+      const foundAnimes = search ? await Anime.find({ $text: { $search: search}}) : await Anime.find({})
+
+      res.status(200).json({ data: foundAnimes })
+    }
+
+    catch(err) {
+      console.log(err)
+    }
+  }
 }
 
 module.exports = new AnimeController(Anime);
